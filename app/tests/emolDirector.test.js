@@ -1,8 +1,8 @@
 jest.setTimeout(30000);
 
 const emolDirector = require('../scrappers/emolDirector');
-const puppeteer   = require('puppeteer');
-const sampleData  = require('./emolPageInfo.json');
+const puppeteer = require('puppeteer');
+const sampleData = require('./emolPageInfo.json');
 const { describe, it, beforeAll, afterAll, expect } = require('@jest/globals');
 
 describe('emolDirector Tests', () => {
@@ -13,13 +13,12 @@ describe('emolDirector Tests', () => {
   beforeAll(async () => {
     browser = await puppeteer.launch({
       headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox'
-      ]
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     page = await browser.newPage();
-    await page.goto('https://www.emol.com/noticias/Nacional/2025/06/10/1168945/senado-multas-por-no-votar.html'); 
+    await page.goto(
+      'https://www.emol.com/noticias/Nacional/2025/06/10/1168945/senado-multas-por-no-votar.html'
+    );
     const director = new emolDirector(page);
     pageInfo = await director.buildPageInfo();
   });
