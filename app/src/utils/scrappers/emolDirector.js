@@ -14,7 +14,6 @@ class emolDirector {
   }
 
   async #setTitle() {
-    console.log('Setting title...');
     await this._page.waitForSelector('.cont_new_detalle_noti');
     const titleElement = await this._page.$('.cont_new_detalle_noti');
     const title = await titleElement.$eval('h1', (el) => el.textContent.trim());
@@ -24,20 +23,16 @@ class emolDirector {
   }
 
   async #setChapters() {
-    console.log('Setting chapters...');
     await this._page.waitForSelector('#cuDetalle_cuTexto_textoNoticia');
     const chapterElements = await this._page.$$(
       '#cuDetalle_cuTexto_textoNoticia div:not([id]):not([class])'
     );
-    console.log(`Found ${chapterElements.length} chapter elements.`);
     let currentChapter = {
       title: 'Cuerpo de la noticia:',
       paragraphs: [],
     };
     for (const chapterElement of chapterElements) {
-      console.log('Processing chapter element...');
       if (chapterElement === null) {
-        console.log('Chapter element is null, skipping...');
         continue;
       }
       await this.#manageChapterElement(currentChapter, chapterElement);
@@ -45,7 +40,6 @@ class emolDirector {
     this._builder.addChapter(currentChapter.title, currentChapter.paragraphs);
   }
   async #setSource() {
-    console.log('Setting source...');
     const source = await this._page.url();
     this._builder.setSource(source);
   }
@@ -53,7 +47,6 @@ class emolDirector {
   async #manageChapterElement(currentChapter, chapterElement) {
     const isElementAnotherNews = await chapterElement.$('div');
     if (isElementAnotherNews) {
-      console.log('Skipping another news element...');
       return;
     }
     const isElementTitle = await chapterElement.$('h2');

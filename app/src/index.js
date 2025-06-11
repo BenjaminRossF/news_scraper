@@ -1,5 +1,5 @@
 const Koa = require('koa');
-const router = require('./routes/scraperRouter');
+const router = require('./src/routes/scraperRouter');
 require('dotenv').config(); // Load environment variables from .env file
 
 const app = new Koa();
