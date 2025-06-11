@@ -1,3 +1,5 @@
+jest.setTimeout(30000);
+
 const emolDirector = require('../scrappers/emolDirector');
 const puppeteer   = require('puppeteer');
 const sampleData  = require('./emolPageInfo.json');
