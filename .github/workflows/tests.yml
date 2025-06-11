@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # list each project folder here; in future add more
         project: [ "app" ]
     defaults:
       run:
@@ -28,5 +27,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run tests
-        run: npm test
+      - name: Run tests and emit JSON results
+        # tell Jest to produce machine‐readable output
+        run: npm test -- --json --outputFile jest-results.json
+
+      - name: Generate Markdown table in job summary
+        # uses built-in $GITHUB_STEP_SUMMARY to write a Markdown table
+        run: |
+          echo "## 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Suite | Total | Passed | Failed |" >> $GITHUB_STEP_SUMMARY
+          echo "|-|-|-|-|"             >> $GITHUB_STEP_SUMMARY
+          # iterate over each suite in the JSON
+          jq -r '.testResults[] | 
+            "| " + (.name | split("/") | last) + 
+            " | " + (.numTotalTests|tostring) +
+            " | " + (.numPassedTests|tostring) +
+            " | " + (.numFailedTests|tostring) + " |"' \
+            jest-results.json >> $GITHUB_STEP_SUMMARY
+        # ensure jq is available on ubuntu-latest

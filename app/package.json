@@ -8,6 +8,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "format": "prettier --write \"**/*.{js,json,md,yml}\""
   },
   "dependencies": {
