@@ -28,20 +28,19 @@ jobs:
         run: npm ci
 
       - name: Run tests and emit JSON results
-        # tell Jest to produce machine‐readable output
         run: npm test -- --json --outputFile jest-results.json
 
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: Generate Markdown table in job summary
-        # uses built-in $GITHUB_STEP_SUMMARY to write a Markdown table
         run: |
           echo "## 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
           echo "| Suite | Total | Passed | Failed |" >> $GITHUB_STEP_SUMMARY
-          echo "|-|-|-|-|"             >> $GITHUB_STEP_SUMMARY
-          # iterate over each suite in the JSON
+          echo "|-|-|-|-|" >> $GITHUB_STEP_SUMMARY
           jq -r '.testResults[] | 
             "| " + (.name | split("/") | last) + 
             " | " + (.numTotalTests|tostring) +
             " | " + (.numPassedTests|tostring) +
             " | " + (.numFailedTests|tostring) + " |"' \
             jest-results.json >> $GITHUB_STEP_SUMMARY
-        # ensure jq is available on ubuntu-latest
