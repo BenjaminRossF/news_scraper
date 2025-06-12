@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  jest-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -27,20 +27,33 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run tests and emit JSON results
-        run: npm test -- --json --outputFile jest-results.json
+      - name: Run tests
+        run: npm test
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
+  pytest-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [ "similarity" ]
+    defaults:
+      run:
+        working-directory: ${{ matrix.project }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Generate Markdown table in job summary
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install dependencies
         run: |
-          echo "## 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "| Suite | Total | Passed | Failed |" >> $GITHUB_STEP_SUMMARY
-          echo "|-|-|-|-|" >> $GITHUB_STEP_SUMMARY
-          jq -r '.testResults[] | 
-            "| " + (.name | split("/") | last) + 
-            " | " + (.numTotalTests|tostring) +
-            " | " + (.numPassedTests|tostring) +
-            " | " + (.numFailedTests|tostring) + " |"' \
-            jest-results.json >> $GITHUB_STEP_SUMMARY
+          poetry install --no-interaction --no-ansi
+
+      - name: Run tests
+        run: |
+          poetry run pytest --maxfail=1 --disable-warnings -q
